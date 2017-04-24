@@ -1,0 +1,11 @@
+﻿Build started 4/24/2017 9:58:55 PM.
+     1>Project "E:\FCI\Third Year\Second Term\Graphics\DrawingPackage\DrawingPackage\DrawingPackage.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt Main.cpp
+         Main.cpp
+     1>e:\fci\third year\second term\graphics\drawingpackage\drawingpackage\main.cpp(14): error C3861: 'Init_Menu': identifier not found
+     1>Done Building Project "E:\FCI\Third Year\Second Term\Graphics\DrawingPackage\DrawingPackage\DrawingPackage.vcxproj" (Build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:00.56
