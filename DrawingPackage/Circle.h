@@ -5,6 +5,10 @@
 #include <math.h>
 #include <algorithm>
 
+#define CIRCLE_DIRECT_CARTESIAN 9
+#define CIRCLE_DIRECT_POLAR 10
+#define CIRCLE_ITERATIVE_POLAR 11
+#define CIRCLE_MIDPOINT 12
 
 class Circle{
 	private:

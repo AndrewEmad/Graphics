@@ -5,6 +5,9 @@
 #include <math.h>
 #include <algorithm>
 
+#define CURVE_HERMIT 13
+#define CURVE_CADINAL_SPLINES 14
+
 class Curve{
 
 	public:
