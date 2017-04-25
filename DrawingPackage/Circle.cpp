@@ -20,6 +20,22 @@ int Circle::distance(int xs, int ys, int xe, int ye){
 	return round(sqrt((xe - xs)*(xe - xs) + (ye - ys)*(ye - ys)));
 }
 
+
+void Circle::DrawParametricCircle(HDC hdc, int xc, int yc, int r, COLORREF c)
+{
+	double x;
+	double y;
+	double dceta = 1.0 / r;
+	double pi = 22.0 / 7;
+	for (double ceta = 0; ceta <= (2 * pi); ceta += dceta)
+	{
+		x = xc + r*cos(ceta);
+		y = yc + r*sin(ceta);
+		SetPixel(hdc, round(x), round(y), c);
+	}
+}
+
+
 void Circle::DrawDirectCartesian(HDC hdc, int xc, int yc, int r, COLORREF color){
 	int y = r;
 	for (int x = 0; x <= y; ++x){

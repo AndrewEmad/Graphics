@@ -1,6 +1,7 @@
 #ifndef SESSION_H
 #define SESSION_H
 #include<vector>
+#include<Windows.h>
 
 
 struct Point{
@@ -16,11 +17,11 @@ struct Point{
 
 struct Command{
 	int Algorithm;
-	int Color;
+	COLORREF Color;
 	int numberOfPoints;
 	Point *points;
 	
-	Command(int alg, int clr, int nop ,Point*p){
+	Command(int alg, COLORREF clr, int nop ,Point*p){
 		Algorithm = alg;
 		Color = clr;
 		numberOfPoints = nop;
@@ -34,14 +35,14 @@ struct Command{
 
 class Session{
 	private:
-		static int BG_Color;
-		static int FG_Color;
+		static COLORREF BG_Color;
+		static COLORREF FG_Color;
 		static std::vector<Command>Commands;
 	public:
-		static void setBackColor(int color);
-		static void setForeColor(int color);
+		static void setBackColor(COLORREF color);
+		static void setForeColor(COLORREF color);
 		static void AddCommand(Command c);
-		static void AddCommand(int algorithm, int numberOfPoints, Point *points, int color);
+		static void AddCommand(int algorithm, int numberOfPoints, Point *points, COLORREF color);
 		static void save();
 		static void load();
 };

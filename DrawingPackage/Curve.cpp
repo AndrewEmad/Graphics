@@ -3,19 +3,40 @@
 #include <algorithm>
 #include "Curve.h"
 
-void Curve::DrawHermitCurve(HDC hdc, POINT p1, POINT p2, POINT p3, POINT p4, COLORREF c)
+void Curve::DrawHermitCurve(HDC hdc, POINT p1, POINT p2, POINT p3, POINT p4, COLORREF color)
 {
-	double dx1 = (p2.x - p1.x);
-	double dy1 = (p2.y - p1.y);
-	double dx2 = (p4.x - p3.x);
-	double dy2 = (p4.y - p3.y);
 
-	int xcoff[4] = { 2 * p1.x + dx1 - 2 * p3.x + dx2, -3 * p1.x - 2 * dx1 + 3 * p3.x - dx2, dx1, p1.x };
-	int ycoff[4] = { 2 * p1.y + dy1 - 2 * p3.y + dy2, -3 * p1.y - 2 * dy1 + 3 * p3.y - dy2, dy1, p1.y };
+	int xcoff[4] = { 2 * p1.x + p2.x - 2 * p3.x + p4.x, -3 * p1.x - 2 * p2.x + 3 * p3.x - p4.x, p2.x, p1.x };
+	int ycoff[4] = { 2 * p1.y + p2.y - 2 * p3.y + p4.y, -3 * p1.y - 2 * p2.y + 3 * p3.y - p4.y, p2.y, p1.y };
 
 	for (double t = 0; t < 1; t += 0.001){
 		int x = xcoff[0] * t*t*t + xcoff[1] * t*t + xcoff[2] * t + xcoff[3] + 0.5;
 		int y = ycoff[0] * t*t*t + ycoff[1] * t*t + ycoff[2] * t + ycoff[3] + 0.5;
-		SetPixel(hdc, x, y, c);
+		SetPixel(hdc, x, y, color);
+	}
+}
+
+void Curve::DrawBezierCurve(HDC hdc, POINT p1, POINT p2, POINT p3, POINT p4, COLORREF color)
+{
+	POINT T1, T2;
+	T1.x = 3 * (p2.x - p1.x);
+	T1.y = 3 * (p2.y - p1.y);
+	T2.x = 3 * (p4.x - p3.x);
+	T2.y = 3 * (p4.y - p3.y);
+	DrawHermitCurve(hdc, p1, T1, p3, T2, color);
+}
+
+
+void Curve::DrawCardinalSpline(HDC hdc, POINT *p, int numOfPoints, double c, COLORREF color)
+{
+	double c1 = 1 - c;
+	POINT T0, T1;
+	T0.x = c1*(p[2].x - p[0].x);
+	T0.y = c1*(p[2].y - p[0].y);
+	for (int i = 2; i < numOfPoints - 1; ++i){
+		T1.x = c1*(p[i+1].x - p[i-1].x);
+		T1.y = c1*(p[i+1].y - p[i-1].y);
+		DrawHermitCurve(hdc,p[i-1],T0,p[i],T1,color);
+		T0 = T1;
 	}
 }

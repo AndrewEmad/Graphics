@@ -6,25 +6,28 @@
 #include <algorithm>
 
 #define CIRCLE_DIRECT_CARTESIAN 9
-#define CIRCLE_DIRECT_POLAR 10
-#define CIRCLE_ITERATIVE_POLAR 11
-#define CIRCLE_MIDPOINT 12
+#define CIRCLE_DIRECT_CARTESIAN 10
+#define CIRCLE_DIRECT_POLAR 11
+#define CIRCLE_ITERATIVE_POLAR 12
+#define CIRCLE_MIDPOINT 13
 
 class Circle{
 	private:
-		void Draw8Points(HDC hdc, int xc, int yc, int a, int b, COLORREF color);
+		static void Draw8Points(HDC hdc, int xc, int yc, int a, int b, COLORREF color);
 
-		int distance(int xs, int ys, int xe, int ye);
+		static int distance(int xs, int ys, int xe, int ye);
 
 
 	public:
-		void DrawDirectCartesian(HDC hdc, int xc, int yc, int r, COLORREF color);
+		static void DrawParametricCircle(HDC hdc, int xc, int yc, int r, COLORREF c);
 
-		void DrawDirectPolar(HDC hdc, int xc, int yc, int r, COLORREF color);
+		static void DrawDirectCartesian(HDC hdc, int xc, int yc, int r, COLORREF color);
 
-		void DrawIterativePolar(HDC hdc, int xc, int yc, int r, COLORREF color);
+		static void DrawDirectPolar(HDC hdc, int xc, int yc, int r, COLORREF color);
 
-		void DrawMidPoint(HDC hdc, int xc, int yc, int r, COLORREF color);
+		static void DrawIterativePolar(HDC hdc, int xc, int yc, int r, COLORREF color);
+
+		static void DrawMidPoint(HDC hdc, int xc, int yc, int r, COLORREF color);
 
 };
 

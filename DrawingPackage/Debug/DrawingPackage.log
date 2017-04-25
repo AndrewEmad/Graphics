@@ -1,18 +1,44 @@
-﻿Build started 4/25/2017 9:32:57 AM.
+﻿Build started 4/25/2017 7:05:31 PM.
      1>Project "E:\FCI\Third Year\Second Term\Graphics\DrawingPackage\DrawingPackage\DrawingPackage.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt Main.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt Circle.cpp Curve.cpp Main.cpp
+         Circle.cpp
+     1>e:\fci\third year\second term\graphics\drawingpackage\drawingpackage\circle.h(9): warning C4005: 'CIRCLE_DIRECT_CARTESIAN' : macro redefinition
+                 e:\fci\third year\second term\graphics\drawingpackage\drawingpackage\circle.h(8) : see previous definition of 'CIRCLE_DIRECT_CARTESIAN'
+     1>e:\fci\third year\second term\graphics\drawingpackage\drawingpackage\circle.cpp(20): warning C4244: 'return' : conversion from 'double' to 'int', possible loss of data
+     1>e:\fci\third year\second term\graphics\drawingpackage\drawingpackage\circle.cpp(34): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+     1>e:\fci\third year\second term\graphics\drawingpackage\drawingpackage\circle.cpp(42): warning C4244: '=' : conversion from 'double' to 'int', possible loss of data
+     1>e:\fci\third year\second term\graphics\drawingpackage\drawingpackage\circle.cpp(54): warning C4244: '=' : conversion from 'double' to 'int', possible loss of data
+     1>e:\fci\third year\second term\graphics\drawingpackage\drawingpackage\circle.cpp(55): warning C4244: '=' : conversion from 'double' to 'int', possible loss of data
+     1>e:\fci\third year\second term\graphics\drawingpackage\drawingpackage\circle.cpp(67): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+     1>e:\fci\third year\second term\graphics\drawingpackage\drawingpackage\circle.cpp(68): warning C4244: 'initializing' : conversion from 'double' to 'int', possible loss of data
+         Generating Code...
+         Compiling...
          Main.cpp
-     1>e:\fci\third year\second term\graphics\drawingpackage\drawingpackage\main.cpp(29): warning C4101: 'hWndButton' : unreferenced local variable
-     1>e:\fci\third year\second term\graphics\drawingpackage\drawingpackage\main.cpp(119): warning C4101: 'hdc' : unreferenced local variable
+     1>e:\fci\third year\second term\graphics\drawingpackage\drawingpackage\circle.h(9): warning C4005: 'CIRCLE_DIRECT_CARTESIAN' : macro redefinition
+                 e:\fci\third year\second term\graphics\drawingpackage\drawingpackage\circle.h(8) : see previous definition of 'CIRCLE_DIRECT_CARTESIAN'
+     1>e:\fci\third year\second term\graphics\drawingpackage\drawingpackage\main.cpp(16): warning C4101: 'hWndButton' : unreferenced local variable
+     1>e:\fci\third year\second term\graphics\drawingpackage\drawingpackage\main.cpp(122): warning C4101: 'hdc' : unreferenced local variable
+         Generating Code...
+     1>cl : Command line warning D9028: minimal rebuild failure, reverting to normal build
+         Compiling...
+         Curve.cpp
+     1>e:\fci\third year\second term\graphics\drawingpackage\drawingpackage\curve.cpp(13): warning C4244: 'initializing' : conversion from 'double' to 'int', possible loss of data
+     1>e:\fci\third year\second term\graphics\drawingpackage\drawingpackage\curve.cpp(14): warning C4244: 'initializing' : conversion from 'double' to 'int', possible loss of data
+     1>e:\fci\third year\second term\graphics\drawingpackage\drawingpackage\curve.cpp(34): warning C4244: '=' : conversion from 'double' to 'LONG', possible loss of data
+     1>e:\fci\third year\second term\graphics\drawingpackage\drawingpackage\curve.cpp(35): warning C4244: '=' : conversion from 'double' to 'LONG', possible loss of data
+     1>e:\fci\third year\second term\graphics\drawingpackage\drawingpackage\curve.cpp(37): warning C4244: '=' : conversion from 'double' to 'LONG', possible loss of data
+     1>e:\fci\third year\second term\graphics\drawingpackage\drawingpackage\curve.cpp(38): warning C4244: '=' : conversion from 'double' to 'LONG', possible loss of data
+         Generating Code...
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"E:\FCI\Third Year\Second Term\Graphics\DrawingPackage\Debug\DrawingPackage.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:\FCI\Third Year\Second Term\Graphics\DrawingPackage\Debug\DrawingPackage.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\FCI\Third Year\Second Term\Graphics\DrawingPackage\Debug\DrawingPackage.lib" /MACHINE:X86 Debug\Circle.obj
          Debug\Curve.obj
          Debug\Line.obj
          Debug\Main.obj
+         Debug\Session.obj
          DrawingPackage.vcxproj -> E:\FCI\Third Year\Second Term\Graphics\DrawingPackage\Debug\DrawingPackage.exe
      1>Done Building Project "E:\FCI\Third Year\Second Term\Graphics\DrawingPackage\DrawingPackage\DrawingPackage.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.84
+Time Elapsed 00:00:01.95
