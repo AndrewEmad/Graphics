@@ -5,7 +5,7 @@
 #include <math.h>
 #include <algorithm>
 
-#define CIRCLE_DIRECT_CARTESIAN 9
+#define CIRCLE_PARAMETRIC 9
 #define CIRCLE_DIRECT_CARTESIAN 10
 #define CIRCLE_DIRECT_POLAR 11
 #define CIRCLE_ITERATIVE_POLAR 12
