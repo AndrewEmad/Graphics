@@ -19,38 +19,3 @@ void Curve::DrawHermitCurve(HDC hdc, POINT p1, POINT p2, POINT p3, POINT p4, COL
 		SetPixel(hdc, x, y, c);
 	}
 }
-
-
-void Curve::DrawCurve(HDC hdc, COLORREF color){
-	int d = -49;
-	int y = 0;
-	int x = 0;
-	for (x = 0; x <= 10; ++x){
-		SetPixel(hdc, 150 + x, 150 + y, color);
-		SetPixel(hdc, 150 - x, 150 + y, color);
-		if (d > 0)
-		{
-			d += 2 * x - 97; y++;
-
-
-		}
-		else{
-			d += 2 * x + 3;
-		}
-	}
-	for (; x < 35; ++y){
-		SetPixel(hdc, 150 + x, 150 + y, color);
-		SetPixel(hdc, 150 - x, 150 + y, color);
-		if (d > 0)
-		{
-			d += 2 * y - 97;
-
-
-		}
-		else{
-			d += 2 * y + 3;
-			x++;
-		}
-	}
-
-}
