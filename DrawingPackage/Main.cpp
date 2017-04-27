@@ -4,6 +4,7 @@
 #include "Line.h"
 #include "Circle.h"
 #include "Curve.h"
+#include "Filling.h"
 #include "Colors.h"
 #include "Session.h"
 
@@ -56,13 +57,13 @@ void Init_Menu(HMENU &hMenubar){
 	AppendMenuW(file, MF_SEPARATOR, 0, NULL);
 	AppendMenuW(file, MF_STRING, 4, L"&Quit");
 
-	HMENU algorithms = CreateMenu();
+	HMENU shapes = CreateMenu();
 	HMENU line = CreateMenu();
 	AppendMenuW(line, MF_STRING|MF_CHECKED, LINE_PARAMETRIC, L"&Parametric Method");
 	AppendMenuW(line, MF_STRING, LINE_DIRECT, L"&Direct Method");
 	AppendMenuW(line, MF_STRING, LINE_DDA, L"&DDA");
 	AppendMenuW(line, MF_STRING, LINE_MIDPOINT, L"&MidPoint");
-	AppendMenuW(algorithms, MF_POPUP|MF_CHECKED, (UINT_PTR)line, L"&Line");
+	AppendMenuW(shapes, MF_POPUP|MF_CHECKED, (UINT_PTR)line, L"&Line");
 
 	HMENU circle = CreateMenu();
 	AppendMenuW(circle, MF_STRING, CIRCLE_PARAMETRIC, L"&Parametric Method");
@@ -70,13 +71,20 @@ void Init_Menu(HMENU &hMenubar){
 	AppendMenuW(circle, MF_STRING, CIRCLE_DIRECT_POLAR, L"&Direct Polar Method");
 	AppendMenuW(circle, MF_STRING, CIRCLE_ITERATIVE_POLAR, L"&Iterative Polar Method");
 	AppendMenuW(circle, MF_STRING, CIRCLE_MIDPOINT, L"&MidPoint");
-	AppendMenuW(algorithms, MF_POPUP, (UINT_PTR)circle, L"&Circle");
+	AppendMenuW(shapes, MF_POPUP, (UINT_PTR)circle, L"&Circle");
 
 	HMENU curve = CreateMenu();
+	AppendMenuW(curve, MF_STRING, CURVE_FIRST_DEGREE, L"&First Degree Curve");
+	AppendMenuW(curve, MF_STRING, CURVE_SECOND_DEGREE, L"&Second Degree Curve");
 	AppendMenuW(curve, MF_STRING, CURVE_HERMIT, L"&Hermit Curve");
 	AppendMenuW(curve, MF_STRING, CURVE_BEZIER, L"&Bezier Curve");
 	AppendMenuW(curve, MF_STRING, CURVE_CARDINAL_SPLINE, L"&Cardinal Splines");
-	AppendMenuW(algorithms, MF_POPUP, (UINT_PTR)curve, L"&Curve");
+	AppendMenuW(shapes, MF_POPUP, (UINT_PTR)curve, L"&Curve");
+
+	HMENU filled_shapes = CreateMenu();
+	AppendMenuW(filled_shapes, MF_STRING, FILLED_SHAPES_CONVEX, L"&Convex");
+	AppendMenuW(filled_shapes, MF_STRING, FILLED_SHAPES_POLYGON, L"&Polygon");
+	AppendMenuW(shapes, MF_POPUP, (UINT_PTR)filled_shapes, L"&Filled Shapes");
 
 	HMENU color = CreateMenu();
 	HMENU bgcolor = CreateMenu();
@@ -97,8 +105,13 @@ void Init_Menu(HMENU &hMenubar){
 	AppendMenuW(fgcolor, MF_STRING | MF_CHECKED, FG_BLACK, L"&Black");
 	AppendMenuW(color, MF_POPUP, (UINT_PTR)fgcolor, L"&Foreground");
 
+
+	HMENU fill = CreateMenu();
+	AppendMenuW(fill, MF_STRING,FILLING_FLOODFILL_REC, L"&Recursive FloodFill");
+	AppendMenuW(fill, MF_STRING, FILLING_FLOODFILL_NON_REC, L"&Non-Recursive FloodFill");
+
 	AppendMenuW(hMenubar, MF_POPUP, (UINT_PTR)file, L"&File");
-	AppendMenuW(hMenubar, MF_POPUP, (UINT_PTR)algorithms, L"&Algorithms");
+	AppendMenuW(hMenubar, MF_POPUP, (UINT_PTR)shapes, L"&Shapes");
 	AppendMenuW(hMenubar, MF_POPUP, (UINT_PTR)color, L"&Color");
 }
 
@@ -110,7 +123,7 @@ void CheckMenu(HMENU &hMenu,HMENU subMenus[], int cnt,int p,int iD){
 			char name[100];
 			GetMenuString(hMenu, j, (LPWSTR)name, 100, MF_BYPOSITION);
 			ModifyMenuW(hMenu, j, MF_BYPOSITION | MF_POPUP | MF_STRING, (UINT_PTR)(subMenus[j]), (LPWSTR)name);
-			for (int i = LINE_PARAMETRIC; i <= CURVE_CARDINAL_SPLINE; ++i){
+			for (int i = LINE_PARAMETRIC; i <= FILLED_SHAPES_POLYGON; ++i){
 				if (CheckMenuItem(subMenus[j], i, MF_STRING) != -1 && i == iD){
 					CheckMenuItem(subMenus[j], i, MF_CHECKED);
 					ModifyMenuW(hMenu, j, MF_BYPOSITION | MF_POPUP | MF_CHECKED, (UINT_PTR)(subMenus[j]), (LPWSTR)name);
@@ -144,11 +157,11 @@ LRESULT WINAPI MyWindowProc(HWND hwnd, UINT m, WPARAM wp, LPARAM lp)
 	HDC hdc;
 	HMENU hMenu = GetMenu(hwnd);
 	const int numberOfMenus = 4;
-	HMENU AlgorithmsMenu = GetSubMenu(hMenu, 1);
+	HMENU ShapesMenu = GetSubMenu(hMenu, 1);
 	HMENU subMenus[numberOfMenus];
-	subMenus[0] = GetSubMenu(AlgorithmsMenu, 0);
-	subMenus[1] = GetSubMenu(AlgorithmsMenu, 1);
-	subMenus[2] = GetSubMenu(AlgorithmsMenu, 2);
+	for (int i = 0; i < numberOfMenus;++i)
+		subMenus[i] = GetSubMenu(ShapesMenu, i);
+	
 	HMENU ColorMenu = GetSubMenu(hMenu, 2);
 	HMENU subColor[2];
 	subColor[0] = GetSubMenu(ColorMenu, 0);
@@ -160,64 +173,79 @@ LRESULT WINAPI MyWindowProc(HWND hwnd, UINT m, WPARAM wp, LPARAM lp)
 		
 		switch (LOWORD(wp)){
 			case LINE_PARAMETRIC:
-				CheckMenu(AlgorithmsMenu, subMenus,numberOfMenus,0, LINE_PARAMETRIC);
+				CheckMenu(ShapesMenu, subMenus,numberOfMenus,0, LINE_PARAMETRIC);
 				
 				break;
 
 			case LINE_DIRECT:
-				CheckMenu(AlgorithmsMenu, subMenus, numberOfMenus,0, LINE_DIRECT);
+				CheckMenu(ShapesMenu, subMenus, numberOfMenus,0, LINE_DIRECT);
 
 				break;
 
 			case LINE_DDA:
-				CheckMenu(AlgorithmsMenu, subMenus, numberOfMenus,0, LINE_DDA);
+				CheckMenu(ShapesMenu, subMenus, numberOfMenus,0, LINE_DDA);
 
 				break;
 
 			case LINE_MIDPOINT:
-				CheckMenu(AlgorithmsMenu, subMenus, numberOfMenus,0, LINE_MIDPOINT);
+				CheckMenu(ShapesMenu, subMenus, numberOfMenus,0, LINE_MIDPOINT);
 
 				break;
 
 			case CIRCLE_PARAMETRIC:
-				CheckMenu(AlgorithmsMenu, subMenus, numberOfMenus, 0, CIRCLE_PARAMETRIC);
+				CheckMenu(ShapesMenu, subMenus, numberOfMenus, 0, CIRCLE_PARAMETRIC);
 
 				break;
 
 			case CIRCLE_DIRECT_CARTESIAN:
-				CheckMenu(AlgorithmsMenu, subMenus, numberOfMenus,0, CIRCLE_DIRECT_CARTESIAN);
+				CheckMenu(ShapesMenu, subMenus, numberOfMenus,0, CIRCLE_DIRECT_CARTESIAN);
 
 				break;
 
 			case CIRCLE_DIRECT_POLAR:
-				CheckMenu(AlgorithmsMenu, subMenus, numberOfMenus,0, CIRCLE_DIRECT_POLAR);
+				CheckMenu(ShapesMenu, subMenus, numberOfMenus,0, CIRCLE_DIRECT_POLAR);
 
 				break;
 
 			case CIRCLE_ITERATIVE_POLAR:
-				CheckMenu(AlgorithmsMenu, subMenus, numberOfMenus,0, CIRCLE_ITERATIVE_POLAR);
+				CheckMenu(ShapesMenu, subMenus, numberOfMenus,0, CIRCLE_ITERATIVE_POLAR);
 				break;
 
 			case CIRCLE_MIDPOINT:
-				CheckMenu(AlgorithmsMenu, subMenus, numberOfMenus,0, CIRCLE_MIDPOINT);
+				CheckMenu(ShapesMenu, subMenus, numberOfMenus,0, CIRCLE_MIDPOINT);
 
+				break;
+
+			case CURVE_FIRST_DEGREE:
+				CheckMenu(ShapesMenu, subMenus, numberOfMenus, 0, CURVE_FIRST_DEGREE);
+				break;
+
+			case CURVE_SECOND_DEGREE:
+				CheckMenu(ShapesMenu, subMenus, numberOfMenus, 0, CURVE_SECOND_DEGREE);
 				break;
 
 			case CURVE_HERMIT:
-				CheckMenu(AlgorithmsMenu, subMenus, numberOfMenus,0, CURVE_HERMIT);
+				CheckMenu(ShapesMenu, subMenus, numberOfMenus, 0, CURVE_HERMIT);
 				break;
 
 			case CURVE_BEZIER:
-				CheckMenu(AlgorithmsMenu, subMenus, numberOfMenus,0, CURVE_BEZIER);
+				CheckMenu(ShapesMenu, subMenus, numberOfMenus,0, CURVE_BEZIER);
 				break;
 
 			case CURVE_CARDINAL_SPLINE:
-				CheckMenu(AlgorithmsMenu, subMenus, numberOfMenus,0, CURVE_CARDINAL_SPLINE);
+				CheckMenu(ShapesMenu, subMenus, numberOfMenus,0, CURVE_CARDINAL_SPLINE);
+				break;
+
+			case FILLED_SHAPES_CONVEX:
+				CheckMenu(ShapesMenu, subMenus, numberOfMenus, 0, FILLED_SHAPES_CONVEX);
+				break;
+
+			case FILLED_SHAPES_POLYGON:
+				CheckMenu(ShapesMenu, subMenus, numberOfMenus, 0, FILLED_SHAPES_POLYGON);
 				break;
 
 			case BG_WHITE:
 				CheckMenu(ColorMenu, &subColor[0], numberOfMenus,1, BG_WHITE);
-
 				SetClassLong(hwnd, GCLP_HBRBACKGROUND, (LONG)CreateSolidBrush(C_WHITE));
 				Session::setBackColor(C_WHITE);
 				InvalidateRect(hwnd, NULL, TRUE);

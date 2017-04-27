@@ -30,6 +30,9 @@
     <ClCompile Include="Session.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Filling.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Line.h">
@@ -45,6 +48,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Colors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Filling.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

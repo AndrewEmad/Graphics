@@ -3,6 +3,40 @@
 #include <algorithm>
 #include "Curve.h"
 
+
+void DrawFirstDegreeCurve(HDC hdc, POINT ps, POINT pe, COLORREF c)
+{
+	int xCofficient[2] = { pe.x - ps.x, ps.x };
+	int yCofficient[2] = { pe.y - ps.y, ps.y };
+	double x, y;
+	double dt = (max(abs(pe.x - ps.x), abs(pe.y - ps.y)));
+	dt = 1.0 / dt;
+	for (double t = 0; t < 1; t += dt)
+	{
+		x = xCofficient[0] * t + xCofficient[1];
+		y = yCofficient[0] * t + yCofficient[1];
+		SetPixel(hdc, round(x), round(y), c);
+	}
+}
+
+void DrawSecondDegreeCurve(HDC hdc, POINT p1, POINT p2, POINT p3, COLORREF c)
+{
+	int xCofficient[3] = { 2 * p3.x - 4 * p2.x + 2 * p1.x, 4 * p2.x - p3.x - 3 * p1.x, p1.x };
+	int yCofficient[3] = { 2 * p3.y - 4 * p2.y + 2 * p1.y, 4 * p2.y - p3.y - 3 * p1.y, p1.y };
+	double dt = (max(abs(p1.x - p2.x), abs(p1.y - p2.y)));
+	dt = max(dt, (abs(p2.x - p3.x), abs(p2.y - p3.y)));
+	dt = max(dt, (abs(p1.x - p3.x), abs(p1.y - p3.y)));
+	dt = 1.0 / dt;
+	double x, y;
+	for (double t = 0; t < 1; t += 0.0001)
+	{
+		x = xCofficient[0] * pow(t, 2) + xCofficient[1] * t + xCofficient[2];
+		y = yCofficient[0] * pow(t, 2) + yCofficient[1] * t + yCofficient[2];
+		SetPixel(hdc, round(x), round(y), c);
+	}
+
+}
+
 void Curve::DrawHermitCurve(HDC hdc, POINT p1, POINT p2, POINT p3, POINT p4, COLORREF color)
 {
 
