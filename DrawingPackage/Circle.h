@@ -15,7 +15,6 @@ class Circle{
 	private:
 		static void Draw8Points(HDC hdc, int xc, int yc, int a, int b, COLORREF color);
 
-		static int distance(int xs, int ys, int xe, int ye);
 
 
 	public:
@@ -28,6 +27,9 @@ class Circle{
 		static void DrawIterativePolar(HDC hdc, int xc, int yc, int r, COLORREF color);
 
 		static void DrawMidPoint(HDC hdc, int xc, int yc, int r, COLORREF color);
+
+		static int distance(int xs, int ys, int xe, int ye);
+
 
 };
 

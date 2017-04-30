@@ -1,11 +1,30 @@
 #ifndef CLIPPING_H
 #define CLIPPING_H
 #include<Windows.h>
+#include"Point.h"
+#define CLIPPING_RECTANGLE 23
+#define CLIPPING_CIRCLE 24
+#define CLIPPING_NONE 25
 
-#define CLIPPING_POINT_RECTANGLE 23
-#define CLIPPING_LINE_RECTANGLE 24
-#define CLIPPING_POINT_CIRCLE 25
-#define CLIPPING_LINE_CIRCLE 26
+union OutCode
+{
+	unsigned All : 4;
+	struct
+	{
+		unsigned left : 1, right : 1, top : 1, bottom : 1;
+	};
+};
+union Code
+{
+	unsigned all : 1;
+	struct
+	{
+		unsigned outside : 1;
+	};
+};
+
+
+
 
 class Clipping
 {

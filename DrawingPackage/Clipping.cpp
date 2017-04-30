@@ -1,34 +1,8 @@
 #include<Windows.h>
 #include<math.h>
 #include"Clipping.h"
-#include<"Line.h"
-union OutCode
-{
-	unsigned All : 4;
-	struct 
-	{
-		unsigned left : 1, right : 1, top : 1, bottom : 1;
-	};
-};
-union Code
-{
-	unsigned all : 1;
-	struct
-	{
-		unsigned outside : 1;
-	};
-};
-struct Point
-{
-	double x, y;
-	Point()
-	{};
-	Point(double x1, double y1)
-	{
-		x = x1;
-		y = y1;
-	}
-};
+#include "Line.h"
+
 void Clipping::PointClippingRectangle(HDC hdc,int x, int y, int xmin, int ymin, int xmax, int ymax, COLORREF color)
 {
 	if (x >= xmin&&x <= xmax&&y >= ymin&&y <= ymax)
@@ -128,7 +102,7 @@ void Clipping::LineClippingRectangle(HDC hdc, double xs, double ys, double xe, d
 	}
 	if (!outCode1.All&!outCode2.All)
 	{
-		DrawDDA(hdc, xs, ys, xe, ye, color);
+		Line::DrawParametric(hdc, xs, ys, xe, ye, color);
 	}
 }
 
@@ -195,7 +169,7 @@ void Clipping::LineClippingCircle(HDC hdc, double xs, double ys, double xe, doub
 	}
 	if (!outCode1.all&!outCode2.all)
 	{
-		DrawDDA(hdc, xs, ys, xe, ye, color);
+		Line::DrawParametric(hdc, xs, ys, xe, ye, color);
 	}
 }
 /*Code Clipping::getCode(double x, double y, int xc, int yc, double r)

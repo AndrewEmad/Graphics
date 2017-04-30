@@ -79,18 +79,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Circle.cpp" />
+    <ClCompile Include="Clipping.cpp" />
     <ClCompile Include="Curve.cpp" />
     <ClCompile Include="Filling.cpp" />
     <ClCompile Include="Line.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Point.cpp" />
     <ClCompile Include="Session.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Circle.h" />
+    <ClInclude Include="Clipping.h" />
     <ClInclude Include="Colors.h" />
     <ClInclude Include="Curve.h" />
     <ClInclude Include="Filling.h" />
     <ClInclude Include="Line.h" />
+    <ClInclude Include="Point.h" />
     <ClInclude Include="Session.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,17 +1,15 @@
-
-#include"Session.h"
 #include "Filling.h"
 
-EdgeRec Filling::getRecord(POINT &v1, POINT &v2){
+EdgeRec Filling::getRecord(Point &v1, Point &v2){
 	if (v1.y > v2.y)
 		std::swap(v1, v2);
 	return EdgeRec(v1.x, 1.0*(v1.x - v2.x) / (v1.y - v2.y), v2.y);
 }
 
-void Filling::initEdgeRecTable(POINT *polygon, int n, std::vector<EdgeRec>  table[]){
-	POINT v1 = polygon[n - 1];
+void Filling::initEdgeRecTable(Point *polygon, int n, std::vector<EdgeRec>  table[]){
+	Point v1 = polygon[n - 1];
 	for (int i = 0; i < n; ++i){
-		POINT v2 = polygon[i];
+		Point v2 = polygon[i];
 		if (v1.y == v2.y){ v1 = v2; continue; }
 		EdgeRec rec = getRecord(v1, v2);
 		table[v1.y].push_back(rec);
@@ -19,7 +17,7 @@ void Filling::initEdgeRecTable(POINT *polygon, int n, std::vector<EdgeRec>  tabl
 	}
 }
 
-void Filling::polygonFill(HDC hdc, POINT *polygon, int n, COLORREF color){
+void Filling::polygonFill(HDC hdc, Point *polygon, int n, COLORREF color){
 	std::vector<EdgeRec>  table[1000];
 	initEdgeRecTable(polygon, n, table);
 	int y = 0;
@@ -55,7 +53,7 @@ void Filling::initEdgeTable(Edge tbl[]){
 	}
 }
 
-void Filling::constructEdges(POINT v1, POINT v2, Edge tbl[]){
+void Filling::constructEdges(Point v1, Point v2, Edge tbl[]){
 	if (v1.y > v2.y)
 		std::swap(v1, v2);
 	if (v1.y == v2.y)return;
@@ -68,19 +66,19 @@ void Filling::constructEdges(POINT v1, POINT v2, Edge tbl[]){
 	}
 }
 
-void Filling::convexFill(HDC hdc, POINT *polygon, int n, COLORREF color){
+void Filling::convexFill(HDC hdc, Point *polygon, int n, COLORREF color){
 	Edge tbl[1000];
 	initEdgeTable(tbl);
-	POINT v1 = polygon[n - 1];
+	Point v1 = polygon[n - 1];
 	for (int i = 0; i < n; ++i){
-		POINT v2 = polygon[i];
+		Point v2 = polygon[i];
 		constructEdges(v1, v2, tbl);
 		v1 = v2;
 	}
 	for (int y = 0; y < 1000; ++y){
 		if (tbl[y].xmin < tbl[y].xmax)
 		for (int i = tbl[y].xmin; i <= tbl[y].xmax; ++i){
-			SetPixel(hdc, i, y, c);
+			SetPixel(hdc, i, y, color);
 		}
 	}
 }

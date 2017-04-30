@@ -2,18 +2,8 @@
 #define SESSION_H
 #include<vector>
 #include<Windows.h>
+#include"Point.h"
 
-
-struct Point{
-	int x;
-	int y;
-
-	Point(){}
-	Point(int x1,int y1){
-		x = x1;
-		y = y1;
-	}
-};
 
 struct Command{
 	int Algorithm;
@@ -41,6 +31,8 @@ class Session{
 	public:
 		static void setBackColor(COLORREF color);
 		static void setForeColor(COLORREF color);
+		static COLORREF getBackColor();
+		static COLORREF getForeColor();
 		static void AddCommand(Command c);
 		static void AddCommand(int algorithm, int numberOfPoints, Point *points, COLORREF color);
 		static void save();

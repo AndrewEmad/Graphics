@@ -1,8 +1,8 @@
 #include<vector>
 #include"Session.h"
-
-COLORREF Session::BG_Color=0;
-COLORREF Session::FG_Color=0;
+#include "Colors.h"
+COLORREF Session::BG_Color=C_WHITE;
+COLORREF Session::FG_Color=C_BLACK;
 std::vector<Command>Session::Commands;
 
 void Session::setBackColor(COLORREF color){
@@ -13,6 +13,18 @@ void Session::setBackColor(COLORREF color){
 void Session::setForeColor(COLORREF color){
 	FG_Color = color;
 }
+
+
+COLORREF Session::getBackColor(){
+	return BG_Color;
+}
+
+
+COLORREF Session::getForeColor(){
+	return FG_Color;
+}
+
+
 void Session::AddCommand(Command c){
 	Commands.push_back(c);
 }

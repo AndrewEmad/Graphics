@@ -4,7 +4,7 @@
 #include "Curve.h"
 
 
-void DrawFirstDegreeCurve(HDC hdc, POINT ps, POINT pe, COLORREF c)
+void Curve::DrawFirstDegreeCurve(HDC hdc, Point ps, Point pe, COLORREF c)
 {
 	int xCofficient[2] = { pe.x - ps.x, ps.x };
 	int yCofficient[2] = { pe.y - ps.y, ps.y };
@@ -19,7 +19,7 @@ void DrawFirstDegreeCurve(HDC hdc, POINT ps, POINT pe, COLORREF c)
 	}
 }
 
-void DrawSecondDegreeCurve(HDC hdc, POINT p1, POINT p2, POINT p3, COLORREF c)
+void Curve::DrawSecondDegreeCurve(HDC hdc, Point p1, Point p2, Point p3, COLORREF c)
 {
 	int xCofficient[3] = { 2 * p3.x - 4 * p2.x + 2 * p1.x, 4 * p2.x - p3.x - 3 * p1.x, p1.x };
 	int yCofficient[3] = { 2 * p3.y - 4 * p2.y + 2 * p1.y, 4 * p2.y - p3.y - 3 * p1.y, p1.y };
@@ -37,7 +37,7 @@ void DrawSecondDegreeCurve(HDC hdc, POINT p1, POINT p2, POINT p3, COLORREF c)
 
 }
 
-void Curve::DrawHermitCurve(HDC hdc, POINT p1, POINT p2, POINT p3, POINT p4, COLORREF color)
+void Curve::DrawHermitCurve(HDC hdc, Point p1, Point p2, Point p3, Point p4, COLORREF color)
 {
 
 	int xcoff[4] = { 2 * p1.x + p2.x - 2 * p3.x + p4.x, -3 * p1.x - 2 * p2.x + 3 * p3.x - p4.x, p2.x, p1.x };
@@ -50,9 +50,9 @@ void Curve::DrawHermitCurve(HDC hdc, POINT p1, POINT p2, POINT p3, POINT p4, COL
 	}
 }
 
-void Curve::DrawBezierCurve(HDC hdc, POINT p1, POINT p2, POINT p3, POINT p4, COLORREF color)
+void Curve::DrawBezierCurve(HDC hdc, Point p1, Point p2, Point p3, Point p4, COLORREF color)
 {
-	POINT T1, T2;
+	Point T1, T2;
 	T1.x = 3 * (p2.x - p1.x);
 	T1.y = 3 * (p2.y - p1.y);
 	T2.x = 3 * (p4.x - p3.x);
@@ -61,10 +61,10 @@ void Curve::DrawBezierCurve(HDC hdc, POINT p1, POINT p2, POINT p3, POINT p4, COL
 }
 
 
-void Curve::DrawCardinalSpline(HDC hdc, POINT *p, int numOfPoints, double c, COLORREF color)
+void Curve::DrawCardinalSpline(HDC hdc, Point *p, int numOfPoints, COLORREF color)
 {
-	double c1 = 1 - c;
-	POINT T0, T1;
+	double c1 = 1 - 0.001;
+	Point T0, T1;
 	T0.x = c1*(p[2].x - p[0].x);
 	T0.y = c1*(p[2].y - p[0].y);
 	for (int i = 2; i < numOfPoints - 1; ++i){
