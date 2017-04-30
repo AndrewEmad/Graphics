@@ -21,7 +21,6 @@ private:
 	static Point HTntersect(double x1, double y1, double x2, double y2, int yEdge);
 	static OutCode getOutCode(double x, double y, int xmin, int ymin, int xmax, int ymax);
 	
-	static Point Intersection(double x, double y, int xc, int yc, double r);
 public:
 	static void PointClippingRectangle(HDC hdc, int x, int y, int xmin, int ymin, int xmax, int ymax, COLORREF color);
 	static void LineClippingRectangle(HDC hdc, double xs, double ys, double xe, double ye, int xmin, int ymin, int xmax, int ymax, COLORREF  color);
