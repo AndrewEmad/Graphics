@@ -1,8 +1,8 @@
 #include<Windows.h>
 #include<math.h>
+#include<algorithm>
 #include"Clipping.h"
-#include "Line.h"
-
+#include<"Line.h"
 void Clipping::PointClippingRectangle(HDC hdc,int x, int y, int xmin, int ymin, int xmax, int ymax, COLORREF color)
 {
 	if (x >= xmin&&x <= xmax&&y >= ymin&&y <= ymax)
@@ -102,11 +102,10 @@ void Clipping::LineClippingRectangle(HDC hdc, double xs, double ys, double xe, d
 	}
 	if (!outCode1.All&!outCode2.All)
 	{
-		Line::DrawParametric(hdc, xs, ys, xe, ye, color);
+		DrawDDA(hdc, xs, ys, xe, ye, color);
 	}
 }
 
-// clipping point for a circle window
 void Clipping::PointClippingCircle(HDC hdc, int x, int y, int xc, int yc, double r, COLORREF color)
 {
 	double result = sqrt((pow((x - xc)*1.0, 2) + pow((y - yc)*1.0, 2)));
@@ -116,112 +115,42 @@ void Clipping::PointClippingCircle(HDC hdc, int x, int y, int xc, int yc, double
 
 	}
 }
-Code Clipping::getCode(double x, double y, int xc, int yc, double r)
+void Clipping::LineClippingCircle(HDC hdc, double xs, double ys, double xe, double ye, int xc, int yc, double r, COLORREF color)
 {
-	Code result;
-	double dist = sqrt((x - xc)*(x - xc) + (y - yc)*(y - yc));
-	result.all = 0;
-	if (dist > r)
+	int dx = xe - xs;
+	int dy = ye - ys;
+	if (abs(dy) < abs(dx))
 	{
-		result.outside = 1;
-	}
-	return result;
-}
-Point Clipping::Intersection(double x, double y, int xc, int yc, double r)
-{
-	Point point;
-	double dist = sqrt(pow(x - xc, 2) + pow(y - yc, 2));
-	if (dist <= r)
-	{
-		point.x = x;
-		point.y = y;
+		double slope = dy*1.0 / dx;
+		if (xs>xe)
+		{
+			std::swap(xs, xe);
+			std::swap(ys, ye);
+		}
+		int x = xs;
+		double y = ys;
+		while (x < xe)
+		{
+			PointClippingCircle(hdc, x, y+0.5, xc, yc, r, color);
+			x += 1;
+			y += slope;
+		}
 	}
 	else
 	{
-		double slope = (y - yc) / (x - xc);
-		point.x = xc + r*cos(slope);
-		point.y = yc + r*sin(slope);
-	}
-	return point;
-}
-void Clipping::LineClippingCircle(HDC hdc, double xs, double ys, double xe, double ye, int xc, int yc, double r, COLORREF color)
-{
-	Code outCode1 = getCode(xs, ys, xc, yc, r);
-	Code outCode2 = getCode(xe, ye, xc, yc, r);
-	while ((outCode1.all || outCode2.all) && !(outCode1.all&outCode2.all))
-	{
-		if (outCode1.all)
+		double slope = dx*1.0 / dy;
+		if (ys>ye)
 		{
-			Point point;
-			point = Intersection(xs, ys, xc, yc, r);
-			xs = point.x;
-			ys = point.y;
-			outCode1 = getCode(xs, ys, xc, yc, r);
+			std::swap(xs, xe);
+			std::swap(ys, ye);
 		}
-		else if (outCode2.all)
+		double x = xs;
+		int y = ys;
+		while (y < ye)
 		{
-			Point point;
-			point = Intersection(xe, ye, xc, yc, r);
-			xe = point.x;
-			ye = point.y;
-			outCode2 = getCode(xe, ye, xc, yc, r);
+			PointClippingCircle(hdc,x+0.5,y , xc, yc, r, color);
+			x += slope;
+			y += 1;
 		}
 	}
-	if (!outCode1.all&!outCode2.all)
-	{
-		Line::DrawParametric(hdc, xs, ys, xe, ye, color);
-	}
 }
-/*Code Clipping::getCode(double x, double y, int xc, int yc, double r)
-{
-	Code result;
-	result.all = 0;
-	double res = sqrt((x - xc)*(x - xc) + (y - yc)*(y - yc));
-	if (res > r)
-	{
-		result.outside = 1;
-	}
-	return result;
-}
-Point Clipping::Intersection(double x, double y, int xc, int yc, double r)
-{
-	double slope = (y - yc) / (x - xc);
-	Point point;
-	point.x = xc + r*1.0/sqrt(1 / (slope*slope));
-	point.y = yc + r*1.0 / sqrt(1 + 1 / (slope*slope));
-	return point;
-}
-void Clipping::LineClippingCircle(HDC hdc,double xs, double ys, double xe, double ye, int xc, int yc, double r, COLORREF color)
-{
-	Code outCode1 = getCode(xs, ys, xc, yc, r);
-	Code outCode2 = getCode(xe, ye, xc, yc, r);
-	while ((outCode1.all || outCode2.all) && !(outCode1.all&outCode2.all))
-	{
-		if (outCode1.all)
-		{
-			Point point;
-			if (outCode1.outside)
-			{
-				point=Intersection(xs, ys, xc, yc, r);
-			}
-			xs = point.x;
-			ys = point.y;
-			outCode1 = getCode(xs,ys, xc, yc, r);
-		}
-		else if (outCode2.all)
-		{
-			Point point;
-			if (outCode2.outside)
-			{
-				point = Intersection(xe, ye, xc, yc, r);
-			}
-			xe = point.x;
-			ye = point.y;
-			outCode2 = getCode(xe, ye, xc, yc, r);
-		}
-	}
-	if (!outCode1.all&!outCode2.all)
-	{
-		DrawDDA(hdc, xs, ys, xe, ye, color);
-	}
-}*/
