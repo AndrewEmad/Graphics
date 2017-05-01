@@ -899,6 +899,15 @@ LRESULT WINAPI MyWindowProc(HWND hwnd, UINT m, WPARAM wp, LPARAM lp)
 				EnableMenuItem(subMenus[1], j, MF_BYPOSITION | MF_GRAYED);
 			}
 		}
+		else{
+			CheckMenu(ShapesMenu, subMenus, numberOfMenus, 0, Algorithm);
+			for (int j = 2; j < numberOfMenus - 1; ++j){
+				EnableMenuItem(ShapesMenu, j, MF_BYPOSITION | MF_STRING);
+			}
+			for (int j = 1; j <= 3; ++j){
+				EnableMenuItem(subMenus[1], j, MF_BYPOSITION | MF_STRING);
+			}
+		}
 		break;
 
 	case WM_DESTROY:
