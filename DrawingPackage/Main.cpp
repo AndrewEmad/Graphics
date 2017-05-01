@@ -849,7 +849,7 @@ LRESULT WINAPI MyWindowProc(HWND hwnd, UINT m, WPARAM wp, LPARAM lp)
 				if (MessageBox(hwnd, L"Unsaved Changes will be lost. Continue ?", L"Set Drawing Area", MB_YESNO) == IDYES)
 				{
 					Session::setFGCColor(Session::getForeColor());
-					Algorithm = LINE_PARAMETRIC;
+					Algorithm = D_POINT;
 					SetClassLong(hwnd, GCLP_HBRBACKGROUND, (LONG)CreateSolidBrush(Session::getBackColor()));
 					InvalidateRect(hwnd, NULL, TRUE);
 					UpdateWindow(hwnd);
@@ -871,7 +871,7 @@ LRESULT WINAPI MyWindowProc(HWND hwnd, UINT m, WPARAM wp, LPARAM lp)
 				if (MessageBox(hwnd, L"Unsaved Changes will be lost. Continue ?", L"Set Drawing Area", MB_YESNO) == IDYES)
 				{
 					Session::setFGCColor(Session::getForeColor());
-					Algorithm = LINE_PARAMETRIC;
+					Algorithm = D_POINT;
 					SetClassLong(hwnd, GCLP_HBRBACKGROUND, (LONG)CreateSolidBrush(Session::getBackColor()));
 					InvalidateRect(hwnd, NULL, TRUE);
 					UpdateWindow(hwnd);
@@ -891,7 +891,7 @@ LRESULT WINAPI MyWindowProc(HWND hwnd, UINT m, WPARAM wp, LPARAM lp)
 
 		}
 		if (Session::getClippingAlgorithm() == CLIPPING_CIRCLE || Session::getClippingAlgorithm() == CLIPPING_RECTANGLE){
-			CheckMenu(ShapesMenu, subMenus, numberOfMenus, 0, LINE_PARAMETRIC);
+			CheckMenu(ShapesMenu, subMenus, numberOfMenus, 0, Algorithm);
 			for (int j = 2; j < numberOfMenus-1; ++j){
 				EnableMenuItem(ShapesMenu, j, MF_BYPOSITION | MF_GRAYED);
 			}

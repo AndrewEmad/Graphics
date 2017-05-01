@@ -70,7 +70,7 @@ void Session::AddCommand(int algorithm ,int numberOfPoints, Point *points, COLOR
 
 bool Session::save(string filePath){
 	fstream file;
-	file.open(filePath, ios::out|ios::in|ios::binary);
+	file.open(filePath, ios::out|ios::binary);
 	if (file.is_open()){
 		file.write((char*)&BG_Color, sizeof(BG_Color));
 		file.write((char*)&BG_Tag, sizeof(BG_Tag));
