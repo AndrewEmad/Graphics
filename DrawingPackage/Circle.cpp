@@ -69,7 +69,6 @@ void Circle::DrawIterativePolar(HDC hdc, int xc, int yc, int r, COLORREF color){
 		x = x*cdt - y*sdt;
 		y = tmpX*sdt + y*cdt;
 	}
-
 }
 
 void Circle::DrawMidPoint(HDC hdc, int xc, int yc, int r, COLORREF color){

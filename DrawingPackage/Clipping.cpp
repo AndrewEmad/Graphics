@@ -2,7 +2,7 @@
 #include<math.h>
 #include<algorithm>
 #include"Clipping.h"
-#include<"Line.h"
+#include"Line.h"
 void Clipping::PointClippingRectangle(HDC hdc,int x, int y, int xmin, int ymin, int xmax, int ymax, COLORREF color)
 {
 	if (x >= xmin&&x <= xmax&&y >= ymin&&y <= ymax)
@@ -102,7 +102,7 @@ void Clipping::LineClippingRectangle(HDC hdc, double xs, double ys, double xe, d
 	}
 	if (!outCode1.All&!outCode2.All)
 	{
-		DrawDDA(hdc, xs, ys, xe, ye, color);
+		Line::DrawDDA(hdc, xs, ys, xe, ye, color);
 	}
 }
 

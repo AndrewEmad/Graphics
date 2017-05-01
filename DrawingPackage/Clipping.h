@@ -2,10 +2,9 @@
 #define CLIPPING_H
 #include<Windows.h>
 #include"Point.h"
-#define CLIPPING_POINT_RECTANGLE 23
-#define CLIPPING_LINE_RECTANGLE 24
-#define CLIPPING_POINT_CIRCLE 25
-#define CLIPPING_LINE_CIRCLE 26
+#define CLIPPING_RECTANGLE 24
+#define CLIPPING_CIRCLE 25
+#define CLIPPING_NONE 26
 union OutCode
 {
 	unsigned All : 4;
@@ -24,7 +23,6 @@ private:
 public:
 	static void PointClippingRectangle(HDC hdc, int x, int y, int xmin, int ymin, int xmax, int ymax, COLORREF color);
 	static void LineClippingRectangle(HDC hdc, double xs, double ys, double xe, double ye, int xmin, int ymin, int xmax, int ymax, COLORREF  color);
-	
 	static void PointClippingCircle(HDC hdc, int x, int y, int xc, int yc, double r, COLORREF c);
 	static void LineClippingCircle(HDC hdc, double x1, double y1,double x2,double y2, int xc, int yc, double r, COLORREF c);
 };

@@ -93,7 +93,7 @@ void Filling::FloodFillNonRec(HDC hdc, int x, int y, COLORREF bc, COLORREF fc)
 		Point p = st.top();
 		st.pop();
 		COLORREF c = GetPixel(hdc, p.x, p.y);
-		if (c == bc || c == fc)
+		if (c != bc || c == fc)
 		{
 			continue;
 		}
@@ -109,7 +109,7 @@ void Filling::FloodFillNonRec(HDC hdc, int x, int y, COLORREF bc, COLORREF fc)
 void Filling::FloodFillRec(HDC hdc, int x, int y, COLORREF bc, COLORREF fc)
 {
 	COLORREF c = GetPixel(hdc, x, y);
-	if (c == bc || c == fc)
+	if (c != bc||c==fc)
 	{
 		return;
 	}

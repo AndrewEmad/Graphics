@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <Windows.h>
 #include <math.h>
 #include <algorithm>
@@ -8,6 +9,13 @@
 #include "Colors.h"
 #include "Clipping.h"
 #include "Session.h"
+#include "resource.h"
+#include <atlstr.h>
+#define NEW 1000
+#define OPEN 2
+#define SAVE 3
+#define QUIT 4
+
 
 void Init_WNDCLASS(WNDCLASS &wc, HINSTANCE h);
 LRESULT WINAPI MyWindowProc(HWND hwnd, UINT m, WPARAM wp, LPARAM lp);
@@ -36,10 +44,11 @@ int APIENTRY WinMain(HINSTANCE h, HINSTANCE, LPSTR, int n)
 }
 
 void Init_WNDCLASS(WNDCLASS &wc,HINSTANCE h){
+	
 	wc.cbClsExtra = wc.cbWndExtra = 0;
 	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
+	wc.hIcon =  (HICON)LoadImage(GetModuleHandle(NULL),(PCWSTR)IDI_ICON1, IMAGE_ICON, 16, 16, 0);;
 	wc.hInstance = h;
 	wc.lpfnWndProc = MyWindowProc;
 	wc.lpszClassName = L"MainWindow";
@@ -51,9 +60,9 @@ void Init_WNDCLASS(WNDCLASS &wc,HINSTANCE h){
 void Init_Menu(HMENU &hMenubar){
 	hMenubar = CreateMenu();
 	HMENU file = CreateMenu();
-	AppendMenuW(file, MF_STRING, 1, L"&New");
-	AppendMenuW(file, MF_STRING, 2, L"&Open");
-	AppendMenuW(file, MF_STRING, 3, L"&Save");
+	AppendMenuW(file, MF_STRING, NEW, L"&New");
+	AppendMenuW(file, MF_STRING, OPEN, L"&Open");
+	AppendMenuW(file, MF_STRING, SAVE, L"&Save");
 	
 	HMENU clip = CreateMenu();
 	AppendMenuW(clip, MF_STRING|MF_CHECKED, CLIPPING_NONE, L"&None");
@@ -62,15 +71,16 @@ void Init_Menu(HMENU &hMenubar){
 	AppendMenuW(file, MF_POPUP, (UINT_PTR)clip, L"&Set Drawing Area");
 
 	AppendMenuW(file, MF_SEPARATOR, 0, NULL);
-	AppendMenuW(file, MF_STRING, 4, L"&Quit");
+	AppendMenuW(file, MF_STRING, QUIT, L"&Quit");
 
 	HMENU shapes = CreateMenu();
+	AppendMenuW(shapes, MF_CHECKED, D_POINT, L"&Point");
 	HMENU line = CreateMenu();
-	AppendMenuW(line, MF_STRING|MF_CHECKED, LINE_PARAMETRIC, L"&Parametric Method");
+	AppendMenuW(line, MF_STRING, LINE_PARAMETRIC, L"&Parametric Method");
 	AppendMenuW(line, MF_STRING, LINE_DIRECT, L"&Direct Method");
 	AppendMenuW(line, MF_STRING, LINE_DDA, L"&DDA");
 	AppendMenuW(line, MF_STRING, LINE_MIDPOINT, L"&MidPoint");
-	AppendMenuW(shapes, MF_POPUP|MF_CHECKED, (UINT_PTR)line, L"&Line");
+	AppendMenuW(shapes, MF_POPUP, (UINT_PTR)line, L"&Line");
 
 	HMENU circle = CreateMenu();
 	AppendMenuW(circle, MF_STRING, CIRCLE_PARAMETRIC, L"&Parametric Method");
@@ -93,6 +103,13 @@ void Init_Menu(HMENU &hMenubar){
 	AppendMenuW(filled_shapes, MF_STRING, FILLED_SHAPES_POLYGON, L"&Polygon");
 	AppendMenuW(shapes, MF_POPUP, (UINT_PTR)filled_shapes, L"&Filled Shapes");
 
+
+	HMENU fill = CreateMenu();
+	AppendMenuW(fill, MF_STRING, FILLING_FLOODFILL_REC, L"&Recursive Flood Fill");
+	AppendMenuW(fill, MF_STRING, FILLING_FLOODFILL_NON_REC, L"&Non-Recursive Flood Fill");
+	AppendMenuW(shapes, MF_POPUP, (UINT_PTR)fill, L"&Filling");
+
+
 	HMENU color = CreateMenu();
 	HMENU bgcolor = CreateMenu();
 	AppendMenuW(bgcolor, MF_STRING | MF_CHECKED, BG_WHITE, L"&White");
@@ -112,9 +129,6 @@ void Init_Menu(HMENU &hMenubar){
 	AppendMenuW(fgcolor, MF_STRING | MF_CHECKED, FG_BLACK, L"&Black");
 	AppendMenuW(color, MF_POPUP, (UINT_PTR)fgcolor, L"&Foreground");
 
-	HMENU fill = CreateMenu();
-	AppendMenuW(fill, MF_STRING, FILLING_FLOODFILL_REC, L"&Recursive FloodFill");
-	AppendMenuW(fill, MF_STRING, FILLING_FLOODFILL_NON_REC, L"&Non-Recursive FloodFill");
 
 	AppendMenuW(hMenubar, MF_POPUP, (UINT_PTR)file, L"&File");
 	AppendMenuW(hMenubar, MF_POPUP, (UINT_PTR)shapes, L"&Shapes");
@@ -123,11 +137,20 @@ void Init_Menu(HMENU &hMenubar){
 
 void CheckMenu(HMENU &hMenu,HMENU subMenus[], int cnt,int p,int iD){
 	if (p==0){
-		for (int j = 0; j < cnt; ++j){
+
+		if (iD == D_POINT){
+			CheckMenuItem(hMenu, D_POINT, MF_CHECKED);
+		}
+		else{
+			CheckMenuItem(hMenu, D_POINT, MF_STRING);
+
+		}
+
+		for (int j = 1; j < cnt; ++j){
 			char name[100];
 			GetMenuString(hMenu, j, (LPWSTR)name, 100, MF_BYPOSITION);
 			ModifyMenuW(hMenu, j, MF_BYPOSITION | MF_POPUP | MF_STRING, (UINT_PTR)(subMenus[j]), (LPWSTR)name);
-			for (int i = LINE_PARAMETRIC; i <= FILLED_SHAPES_POLYGON; ++i){
+			for (int i = LINE_PARAMETRIC; i <= FILLING_FLOODFILL_NON_REC; ++i){
 				if (CheckMenuItem(subMenus[j], i, MF_STRING) != -1 && i == iD){
 					CheckMenuItem(subMenus[j], i, MF_CHECKED);
 					ModifyMenuW(hMenu, j, MF_BYPOSITION | MF_POPUP | MF_CHECKED, (UINT_PTR)(subMenus[j]), (LPWSTR)name);
@@ -168,7 +191,7 @@ LRESULT WINAPI MyWindowProc(HWND hwnd, UINT m, WPARAM wp, LPARAM lp)
 {
 	HDC hdc;
 	HMENU hMenu = GetMenu(hwnd);
-	const int numberOfMenus = 4;
+	const int numberOfMenus = 6;
 	HMENU FileMenu = GetSubMenu(hMenu, 0);
 	HMENU ShapesMenu = GetSubMenu(hMenu, 1);
 	HMENU subMenus[numberOfMenus];
@@ -180,23 +203,39 @@ LRESULT WINAPI MyWindowProc(HWND hwnd, UINT m, WPARAM wp, LPARAM lp)
 	subColor[0] = GetSubMenu(ColorMenu, 0);
 	subColor[1] = GetSubMenu(ColorMenu, 1);
 	HMENU clipping = GetSubMenu(FileMenu, 3);
-	static int Algorithm = LINE_PARAMETRIC;
-	static int Clip = CLIPPING_NONE;
+	static int Algorithm = D_POINT;
 	static Point points[101];
 	static int numberOfPoints = 0;
-
+	static int xmin = 100;
+	static int ymin = 100;
+	static int xmax = 480;
+	static int ymax = 400;
+	static int xc = (xmin+xmax)/2;
+	static int yc = (ymin + ymax) / 2;
+	static bool clicked = false;
+	OPENFILENAME ofn;
+	char szFile[260];
 	switch (m)
 	{
 
 	case WM_LBUTTONDOWN:
 		switch (Algorithm){
+			case D_POINT:
+				clicked = true;
+			break;
+
 			case LINE_PARAMETRIC:
 				points[numberOfPoints&1] = Point(LOWORD(lp), HIWORD(lp));
 				numberOfPoints++;
 				if (numberOfPoints >= 2)
 				{
 					hdc = GetDC(hwnd);
-					Line::DrawParametric(hdc, points[0].x, points[0].y, points[1].x, points[1].y, Session::getForeColor());
+					if(Session::getClippingAlgorithm() == CLIPPING_NONE)
+						Line::DrawParametric(hdc, points[0].x, points[0].y, points[1].x, points[1].y, Session::getForeColor());
+					else if (Session::getClippingAlgorithm() == CLIPPING_RECTANGLE)
+						Clipping::LineClippingRectangle(hdc, points[0].x, points[0].y, points[1].x, points[1].y, xmin, ymin, xmax, ymax, Session::getForeColor());
+					else if (Session::getClippingAlgorithm() == CLIPPING_CIRCLE)
+						Clipping::LineClippingCircle(hdc, points[0].x, points[0].y, points[1].x, points[1].y,xc,yc,(xmax-xmin)/2, Session::getForeColor());
 					ReleaseDC(hwnd, hdc);
 					Point subPoints[2];
 					memcpy(subPoints, points, 2 * sizeof(Point));
@@ -386,6 +425,23 @@ LRESULT WINAPI MyWindowProc(HWND hwnd, UINT m, WPARAM wp, LPARAM lp)
 				points[numberOfPoints] = Point(LOWORD(lp), HIWORD(lp));
 				numberOfPoints++;
 				break;
+
+
+			case FILLING_FLOODFILL_REC:
+				points[numberOfPoints] = Point(LOWORD(lp), HIWORD(lp));
+				hdc = GetDC(hwnd);
+				Filling::FloodFillRec(hdc, points[numberOfPoints].x, points[numberOfPoints].y, Session::getBackColor(), Session::getForeColor());
+				ReleaseDC(hwnd, hdc);
+				Session::AddCommand(Algorithm, 1, &points[numberOfPoints], Session::getForeColor());
+				break;
+
+			case FILLING_FLOODFILL_NON_REC:
+				points[numberOfPoints] = Point(LOWORD(lp), HIWORD(lp));
+				hdc = GetDC(hwnd);
+				Filling::FloodFillNonRec(hdc, points[numberOfPoints].x, points[numberOfPoints].y, Session::getBackColor(), Session::getForeColor());
+				ReleaseDC(hwnd, hdc);
+				Session::AddCommand(Algorithm, 1, &points[numberOfPoints], Session::getForeColor());
+				break;
 		}
 		break;
 	
@@ -393,6 +449,12 @@ LRESULT WINAPI MyWindowProc(HWND hwnd, UINT m, WPARAM wp, LPARAM lp)
 
 	case WM_RBUTTONDOWN:
 		switch (Algorithm){
+		case LINE_PARAMETRIC:
+		case LINE_DIRECT:
+		case LINE_DDA:
+		case LINE_MIDPOINT:
+			numberOfPoints = 0;
+			break;
 		case CURVE_CARDINAL_SPLINE:
 			if (numberOfPoints > 2){
 				hdc = GetDC(hwnd);
@@ -426,10 +488,117 @@ LRESULT WINAPI MyWindowProc(HWND hwnd, UINT m, WPARAM wp, LPARAM lp)
 		break;
 
 
+	case WM_LBUTTONUP:
+		if (Algorithm == D_POINT)
+			clicked = false;
+		break;
+
+
+	case WM_MOUSEMOVE:
+		if (Algorithm == D_POINT&&clicked)
+		{
+			points[0] = Point(LOWORD(lp), HIWORD(lp));
+			hdc = GetDC(hwnd);
+			if (Session::getClippingAlgorithm() == CLIPPING_NONE)
+				SetPixel(hdc, points[0].x, points[0].y, Session::getForeColor());
+			else if (Session::getClippingAlgorithm() == CLIPPING_RECTANGLE)
+				Clipping::PointClippingRectangle(hdc, points[0].x, points[0].y, xmin, ymin, xmax, ymax, Session::getForeColor());
+			else if (Session::getClippingAlgorithm() == CLIPPING_CIRCLE)
+				Clipping::PointClippingCircle(hdc, points[0].x, points[0].y, xc, yc, (xmax - xmin) / 2, Session::getForeColor());
+			ReleaseDC(hwnd, hdc);
+			Point subPoints[1];
+			memcpy(subPoints, points, 1 * sizeof(Point));
+			Session::AddCommand(Algorithm, 1, subPoints, Session::getForeColor());
+		}
+
 
 	case WM_COMMAND:
 		
 		switch (LOWORD(wp)){
+
+			case NEW:
+				if (MessageBox(hwnd, L"Unsaved Changes will be lost. Continue ?", L"New", MB_YESNO) == IDYES)
+				{
+					SetClassLong(hwnd, GCLP_HBRBACKGROUND, (LONG)CreateSolidBrush(Session::getBackColor()));
+					InvalidateRect(hwnd, NULL, TRUE);
+					UpdateWindow(hwnd);
+					Session::setClippingAlgorithm(CLIPPING_NONE);
+					CheckMenu(FileMenu, &clipping, 1, 3, CLIPPING_NONE);
+
+					Session::clear();
+				}
+				break;
+
+			case OPEN:
+				ZeroMemory(&ofn, sizeof(ofn));
+				ofn.lStructSize = sizeof(ofn);
+				ofn.hwndOwner = hwnd;
+				ofn.lpstrFile = (LPWSTR)szFile;
+				ofn.lpstrFile[0] = '\0';
+				ofn.nMaxFile = sizeof(szFile);
+				ofn.lpstrFilter = L"GDP\0*.gdp\0";
+				ofn.nFilterIndex = 1;
+				ofn.lpstrFileTitle = NULL;
+				ofn.nMaxFileTitle = 0;
+				ofn.lpstrInitialDir = NULL;
+				ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+				if (GetOpenFileName(&ofn) == TRUE)
+				{
+					if (!Session::load(std::string(CW2A((LPCWSTR)szFile)))){
+						MessageBox(hwnd, L"Unable to open the file !", L"Error", 0);
+						break;
+					}
+					CheckMenu(ColorMenu, &subColor[0], 1, 1, Session::getBackTag());
+					CheckMenu(FileMenu, &clipping, 1, 3, Session::getClippingAlgorithm());
+					SetClassLong(hwnd, GCLP_HBRBACKGROUND, (LONG)CreateSolidBrush(Session::getBackColor()));
+					InvalidateRect(hwnd, NULL, TRUE);
+					UpdateWindow(hwnd);
+					hdc = GetDC(hwnd);
+					Session::reDraw(hdc,xmin,ymin,xmax,ymax,xc,yc);
+					ReleaseDC(hwnd, hdc);
+				}
+				break;
+
+			case SAVE:
+				ZeroMemory(&ofn, sizeof(ofn));
+				ofn.lStructSize = sizeof(ofn);
+				ofn.hwndOwner = hwnd;
+				ofn.lpstrFile = (LPWSTR)szFile;
+				ofn.lpstrFile[0] = '\0';
+				ofn.nMaxFile = sizeof(szFile);
+				ofn.lpstrFilter = L"GDP\0*.gdp\0";
+				ofn.nFilterIndex = 1;
+				ofn.lpstrFileTitle = NULL;
+				ofn.nMaxFileTitle = 0;
+				ofn.lpstrInitialDir = NULL;
+				ofn.Flags = OFN_PATHMUSTEXIST;
+
+				if (GetSaveFileName(&ofn) == TRUE)
+				{
+					std::string name = CW2A((LPCWSTR)szFile);
+					if (name.find(".gdp") == std::string::npos)
+						name += ".gdp";
+					if (!Session::save(name)){
+						MessageBox(hwnd, L"Unable to save the file !", L"Error", 0);
+						break;
+					}
+					
+				}
+				break;
+
+			case QUIT:
+				if (MessageBox(hwnd, L"Are you sure you want to quit ? all unsaved changes will be lost", L"Quit", MB_YESNO) == IDYES)
+					PostQuitMessage(0);
+				break;
+
+			case D_POINT:
+				CheckMenu(ShapesMenu, subMenus, numberOfMenus, 0, D_POINT);
+				Algorithm = D_POINT;
+				numberOfPoints = 0;
+				break;
+
+
 			case LINE_PARAMETRIC:
 				CheckMenu(ShapesMenu, subMenus,numberOfMenus,0, LINE_PARAMETRIC);
 				Algorithm = LINE_PARAMETRIC;
@@ -527,51 +696,101 @@ LRESULT WINAPI MyWindowProc(HWND hwnd, UINT m, WPARAM wp, LPARAM lp)
 				numberOfPoints = 0;
 				break;
 
+
+			case FILLING_FLOODFILL_REC:
+				CheckMenu(ShapesMenu, subMenus, numberOfMenus, 0, FILLING_FLOODFILL_REC);
+				Algorithm = FILLING_FLOODFILL_REC;
+				numberOfPoints = 0;
+				break;
+
+			case FILLING_FLOODFILL_NON_REC:
+				CheckMenu(ShapesMenu, subMenus, numberOfMenus, 0, FILLING_FLOODFILL_NON_REC);
+				Algorithm = FILLING_FLOODFILL_NON_REC;
+				numberOfPoints = 0;
+				break;
+
 			case BG_WHITE:
-				CheckMenu(ColorMenu, &subColor[0], 1,1, BG_WHITE);
-				SetClassLong(hwnd, GCLP_HBRBACKGROUND, (LONG)CreateSolidBrush(C_WHITE));
-				Session::setBackColor(C_WHITE);
-				InvalidateRect(hwnd, NULL, TRUE);
+				
+					CheckMenu(ColorMenu, &subColor[0], 1, 1, BG_WHITE);
+					Session::setBackColor(C_WHITE);
+					Session::setBackTag(BG_WHITE);
+
+					SetClassLong(hwnd, GCLP_HBRBACKGROUND, (LONG)CreateSolidBrush(Session::getBackColor()));
+					InvalidateRect(hwnd, NULL, TRUE);
+					UpdateWindow(hwnd);
+					hdc = GetDC(hwnd);
+					Session::reDraw(hdc, xmin, ymin, xmax, ymax, xc, yc);
+					ReleaseDC(hwnd, hdc);
+				
 				break;
 
 			case BG_RED:
-				CheckMenu(ColorMenu, &subColor[0], 1,1, BG_RED);
-
-				SetClassLong(hwnd, GCLP_HBRBACKGROUND, (LONG)CreateSolidBrush(C_RED));
-				Session::setBackColor(C_RED);
-				InvalidateRect(hwnd, NULL, TRUE);
+				
+					CheckMenu(ColorMenu, &subColor[0], 1, 1, BG_RED);
+					Session::setBackColor(C_RED);
+					Session::setBackTag(BG_RED);
+					SetClassLong(hwnd, GCLP_HBRBACKGROUND, (LONG)CreateSolidBrush(Session::getBackColor()));
+					InvalidateRect(hwnd, NULL, TRUE);
+					UpdateWindow(hwnd);
+					hdc = GetDC(hwnd);
+					Session::reDraw(hdc, xmin, ymin, xmax, ymax, xc, yc);
+					ReleaseDC(hwnd, hdc);
+				
 				break;
 
 			case BG_YELLOW:
-				CheckMenu(ColorMenu, &subColor[0], 1,1, BG_YELLOW);
+				
+					CheckMenu(ColorMenu, &subColor[0], 1, 1, BG_YELLOW);
+					Session::setBackColor(C_YELLOW);
+					Session::setBackTag(BG_YELLOW);
 
-				SetClassLong(hwnd, GCLP_HBRBACKGROUND, (LONG)CreateSolidBrush(C_YELLOW));
-				Session::setBackColor(C_YELLOW);
-				InvalidateRect(hwnd, NULL, TRUE);
+					SetClassLong(hwnd, GCLP_HBRBACKGROUND, (LONG)CreateSolidBrush(Session::getBackColor()));
+					InvalidateRect(hwnd, NULL, TRUE);
+					UpdateWindow(hwnd);
+					hdc = GetDC(hwnd);
+					Session::reDraw(hdc, xmin, ymin, xmax, ymax, xc, yc);
+					ReleaseDC(hwnd, hdc);
+				
 				break;
 
 			case BG_GREEN:
-				CheckMenu(ColorMenu, &subColor[0], 1,1, BG_GREEN);
+				
+					CheckMenu(ColorMenu, &subColor[0], 1, 1, BG_GREEN);
+					Session::setBackColor(C_GREEN);
+					Session::setBackTag(BG_GREEN);
 
-				SetClassLong(hwnd, GCLP_HBRBACKGROUND, (LONG)CreateSolidBrush(C_GREEN));
-				Session::setBackColor(C_GREEN);
-				InvalidateRect(hwnd, NULL, TRUE);
+					SetClassLong(hwnd, GCLP_HBRBACKGROUND, (LONG)CreateSolidBrush(Session::getBackColor()));
+					InvalidateRect(hwnd, NULL, TRUE);
+					UpdateWindow(hwnd);
+					hdc = GetDC(hwnd);
+					Session::reDraw(hdc, xmin, ymin, xmax, ymax, xc, yc);
+					ReleaseDC(hwnd, hdc);
+				
 				break;
 
 			case BG_BLUE:
-				CheckMenu(ColorMenu, &subColor[0], 1,1, BG_BLUE);
+					CheckMenu(ColorMenu, &subColor[0], 1, 1, BG_BLUE);
+					Session::setBackColor(C_BLUE);
+					Session::setBackTag(BG_BLUE);
 
-				SetClassLong(hwnd, GCLP_HBRBACKGROUND, (LONG)CreateSolidBrush(C_BLUE));
-				Session::setBackColor(C_BLUE);
-				InvalidateRect(hwnd, NULL, TRUE);
+					SetClassLong(hwnd, GCLP_HBRBACKGROUND, (LONG)CreateSolidBrush(Session::getBackColor()));
+					InvalidateRect(hwnd, NULL, TRUE);
+					UpdateWindow(hwnd);
+					hdc = GetDC(hwnd);
+					Session::reDraw(hdc, xmin, ymin, xmax, ymax, xc, yc);
+					ReleaseDC(hwnd, hdc);
 				break;
 
 			case BG_BLACK:
-				CheckMenu(ColorMenu, &subColor[0], 1,1, BG_BLACK);
-
-				SetClassLong(hwnd, GCLP_HBRBACKGROUND, (LONG)CreateSolidBrush(C_BLACK));
-				Session::setBackColor(C_BLACK);
-				InvalidateRect(hwnd, NULL, TRUE);
+					CheckMenu(ColorMenu, &subColor[0], 1, 1, BG_BLACK);
+					Session::setBackColor(C_BLACK);
+					Session::setBackTag(BG_BLACK);
+					SetClassLong(hwnd, GCLP_HBRBACKGROUND, (LONG)CreateSolidBrush(Session::getBackColor()));
+					InvalidateRect(hwnd, NULL, TRUE);
+					UpdateWindow(hwnd);
+					hdc = GetDC(hwnd);
+					Session::reDraw(hdc, xmin, ymin, xmax, ymax, xc, yc);
+					ReleaseDC(hwnd, hdc);
 				break;
 
 
@@ -614,31 +833,70 @@ LRESULT WINAPI MyWindowProc(HWND hwnd, UINT m, WPARAM wp, LPARAM lp)
 				break;
 
 			case CLIPPING_NONE:
-				CheckMenu(FileMenu, &clipping, 1, 3, CLIPPING_NONE);
-				Clip = CLIPPING_NONE;
-				numberOfPoints = 0;
+				if (MessageBox(hwnd, L"Unsaved Changes will be lost. Continue ?", L"Set Drawing Area", MB_YESNO) == IDYES)
+				{
+					SetClassLong(hwnd, GCLP_HBRBACKGROUND, (LONG)CreateSolidBrush(Session::getBackColor()));
+					InvalidateRect(hwnd, NULL, TRUE);
+					UpdateWindow(hwnd);
+					CheckMenu(FileMenu, &clipping, 1, 3, CLIPPING_NONE);
+					Session::setClippingAlgorithm(CLIPPING_NONE);
+					Session::clear();
+					numberOfPoints = 0;
+				}
 				break;
 
 			case CLIPPING_RECTANGLE:
-				CheckMenu(FileMenu, &clipping, 1, 3, CLIPPING_RECTANGLE);
-				Clip = CLIPPING_RECTANGLE;
-				numberOfPoints = 0;
+				if (MessageBox(hwnd, L"Unsaved Changes will be lost. Continue ?", L"Set Drawing Area", MB_YESNO) == IDYES)
+				{
+					Session::setFGCColor(Session::getForeColor());
+					Algorithm = LINE_PARAMETRIC;
+					SetClassLong(hwnd, GCLP_HBRBACKGROUND, (LONG)CreateSolidBrush(Session::getBackColor()));
+					InvalidateRect(hwnd, NULL, TRUE);
+					UpdateWindow(hwnd);
+					CheckMenu(FileMenu, &clipping, 1, 3, CLIPPING_RECTANGLE);
+					Session::setClippingAlgorithm(CLIPPING_RECTANGLE);
+					Session::clear();
+					numberOfPoints = 0;
+					hdc = GetDC(hwnd);
+					Circle::DrawMidPoint(hdc, xc, yc, (xmax - xmin) / 2, Session::getBackColor());
+					Line::DrawDirect(hdc, xmin, ymin, xmin, ymax, Session::getForeColor());
+					Line::DrawDirect(hdc, xmin, ymin, xmax, ymin, Session::getForeColor());
+					Line::DrawDirect(hdc, xmax, ymin, xmax, ymax, Session::getForeColor());
+					Line::DrawDirect(hdc, xmin, ymax, xmax, ymax, Session::getForeColor());
+					ReleaseDC(hwnd, hdc);
+				}
 				break;
 
 			case CLIPPING_CIRCLE:
-				CheckMenu(FileMenu, &clipping, 1, 3, CLIPPING_CIRCLE);
-				Clip = CLIPPING_CIRCLE;
-				numberOfPoints = 0;
+				if (MessageBox(hwnd, L"Unsaved Changes will be lost. Continue ?", L"Set Drawing Area", MB_YESNO) == IDYES)
+				{
+					Session::setFGCColor(Session::getForeColor());
+					Algorithm = LINE_PARAMETRIC;
+					SetClassLong(hwnd, GCLP_HBRBACKGROUND, (LONG)CreateSolidBrush(Session::getBackColor()));
+					InvalidateRect(hwnd, NULL, TRUE);
+					UpdateWindow(hwnd);
+					CheckMenu(FileMenu, &clipping, 1, 3, CLIPPING_CIRCLE);
+					Session::setClippingAlgorithm(CLIPPING_CIRCLE);
+					Session::clear();
+					numberOfPoints = 0;
+					hdc = GetDC(hwnd);
+					Line::DrawDirect(hdc, xmin, ymin, xmin, ymax, Session::getBackColor());
+					Line::DrawDirect(hdc, xmin, ymin, xmax, ymin, Session::getBackColor());
+					Line::DrawDirect(hdc, xmax, ymin, xmax, ymax, Session::getBackColor());
+					Line::DrawDirect(hdc, xmin, ymax, xmax, ymax, Session::getBackColor());
+					Circle::DrawMidPoint(hdc, xc, yc, (xmax - xmin) / 2, Session::getForeColor());
+					ReleaseDC(hwnd, hdc);
+				}
 				break;
 
 		}
-		if (Clip == CLIPPING_CIRCLE || Clip == CLIPPING_RECTANGLE){
+		if (Session::getClippingAlgorithm() == CLIPPING_CIRCLE || Session::getClippingAlgorithm() == CLIPPING_RECTANGLE){
 			CheckMenu(ShapesMenu, subMenus, numberOfMenus, 0, LINE_PARAMETRIC);
-			for (int j = 1; j < numberOfMenus; ++j){
+			for (int j = 2; j < numberOfMenus-1; ++j){
 				EnableMenuItem(ShapesMenu, j, MF_BYPOSITION | MF_GRAYED);
 			}
 			for (int j = 1; j <= 3; ++j){
-				EnableMenuItem(subMenus[0], j, MF_BYPOSITION | MF_GRAYED);
+				EnableMenuItem(subMenus[1], j, MF_BYPOSITION | MF_GRAYED);
 			}
 		}
 		break;

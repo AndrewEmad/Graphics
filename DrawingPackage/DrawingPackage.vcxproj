@@ -95,7 +95,14 @@
     <ClInclude Include="Filling.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="Point.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Session.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DrawingPackage.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\Brush.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
